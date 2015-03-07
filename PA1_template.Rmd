@@ -5,14 +5,77 @@ output:
     keep_md: true
 ---
 
+This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals throughout the day. The data consists of two months of data from an anonymous individual collected during the months of October and November 2012, and includes the number of steps taken in 5 minute intervals each day.
+
+## Data
+
+The data for this assignment can be downloaded from the course web site:
+
+- Dataset: [Activity monitoring data [52K]](https://d396qusza40orc.cloudfront.net/repdata/data/activity.zip)
+
+The variables included in this dataset are:
+
+- steps: Number of steps taking in a 5-minute interval (missing values are coded as NA)
+- date: The date on which the measurement was taken in YYYY-MM-DD format
+- interval: Identifier for the 5-minute interval in which measurement was taken
+
+The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.
 
 ## Loading and preprocessing the data
 
+```{r echo=F, results='hide', message=F, warning=F}
+if (("dplyr" %in% (installed.packages())) == F) {
+        install.packages("dplyr")
+}
+```
+
+
+The following code downloads, unzips, and loads the data file into a data frame:
+
+```{r}
+## the name of the dataset file
+data_file <- 'activity.csv'
+
+## check OS
+is_windows <- .Platform$OS.type == 'windows'
+
+## download dataset file if not already done so
+if (!file.exists(data_file)) {
+        download.file(url = 'https://d396qusza40orc.cloudfront.net/repdata/data/activity.zip', 
+                      destfile = 'activity.zip',
+                      method = ifelse(is_windows, "auto", "curl"))
+        unzip(zipfile = 'activity.zip', files = data_file)
+}
+
+## read the entire dateset
+data <- read.csv(file = data_file)
+```
 
 
 ## What is mean total number of steps taken per day?
 
+1. Calculate the total number of steps taken per day
+```{r message=F, warning=F}
+library(dplyr)
+total_steps_by_day <- 
+        data %>% 
+        group_by(date) %>% 
+        summarise(steps = sum(steps, na.rm = T))
+```
 
+2. Make a histogram of the total number of steps taken each day
+```{r echo=FALSE}
+hist(x = total_steps_by_day$steps, freq = F, breaks = 61)
+```
+
+3. Calculate and report the mean and median of the total number of steps taken per day
+```{r}
+mean <- mean(total_steps_by_day$steps)
+median <- median(total_steps_by_day$steps)
+```
+
+- The mean of the total number of steps taken per days is `r floor(mean)`.
+- The median of the total number of steps taken per days is `r median`.
 
 ## What is the average daily activity pattern?
 
