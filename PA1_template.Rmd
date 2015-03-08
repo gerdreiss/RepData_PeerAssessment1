@@ -61,13 +61,9 @@ if (!file.exists(data_file)) {
 ## read the entire dateset
 rawdata <- read.csv(file = data_file, colClasses = c("integer", "Date", "character"))
 
-## check data for NA values
-na_steps <- sum(is.na(rawdata$steps))
-na_dates <- sum(is.na(rawdata$date))
-na_intervals <- sum(is.na(rawdata$interval))
+## take a look at the first 10 rows
+head(rawdata, n = 10)
 ```
-
-We have `r ifelse(na_steps == 0, 'no', na_steps)` NA values for steps, `r ifelse(na_dates == 0, 'no', na_dates)` NA values for dates, and `r ifelse(na_intervals == 0, 'no', na_intervals)` NA values for intervals.
 
 When looking at the values of the column 'interval' we can observe that they are numerical with a certain pattern:
 ```
@@ -84,26 +80,36 @@ This lets us conclude that the values represent the time of the day:
 Following this pattern we can transform the values to datetime format:
 
 ```{r}
-## add a column containing datatime values using '1970-01-01' as a dummy date,
+## create a function that will transform an interval string into a datetime using '1970-01-01' as a dummy date,
 ## and the transformed time of the column interval
 interval_to_datetime <- function(interv) {
-        digits = strsplit(str_pad(interv, 4, pad = "0"),"")[[1]]
-        t_string = paste0(paste(digits[1:2], collapse = ""), ":", paste(digits[3:4], collapse = ""), ":00")
-        dt_string = paste("1970-01-01", t_string)
-        dt = as.POSIXct(strptime(dt_string, "%Y-%m-%d %H:%M:%S", tz = Sys.timezone()))
-        dt
+        sapply(interv, function(interv) {
+                # fill the interval string with zeros and split in 4 characters
+                digits = strsplit(str_pad(interv, 4, pad = "0"),"")[[1]]
+
+                # create a time string in the format XX:XX:XX
+                t_string = paste0(paste(digits[1:2], collapse = ""), ":", paste(digits[3:4], collapse = ""), ":00")
+
+                # convert the time string into a datetime object
+                dt = as.POSIXct(strptime(paste("1970-01-01", t_string), "%Y-%m-%d %H:%M:%S", tz = Sys.timezone()))
+
+                # return the result
+                return(dt)
+        })
 }
-rawdata$interv_time <- sapply(rawdata$interval, interval_to_datetime)
+
+## add the new column using the function interval_to_datetime
+activity <- mutate(tbl_df(rawdata), interv_time = interval_to_datetime(interval))
 ```
 
-## What is mean total number of steps taken per day?
+## What is the mean total number of steps taken per day?
 
 1. Calculate the total number of steps taken per day
 
 ```{r}
 total_steps_by_day <- 
-        rawdata %>%
-        na.omit %>% 
+        activity %>%
+        na.omit %>%
         group_by(date) %>% 
         summarise(steps = sum(steps))
 ```
@@ -118,12 +124,12 @@ hist(total_steps_by_day$steps, xlab = "Total Steps Per Day", ylab = "Number of D
 3. Calculate and report the mean and median of the total number of steps taken per day
 
 ```{r echo=FALSE}
-mean_steps <- mean(total_steps_by_day$steps)
-median_steps <- median(total_steps_by_day$steps)
+mean_steps <- format(mean(total_steps_by_day$steps), nsmall = 0)
+median_steps <- format(median(total_steps_by_day$steps), nsmall = 0)
 ```
 
-- The mean of the total number of steps taken per days is `r format(mean_steps, nsmall = 0)`.
-- The median of the total number of steps taken per days is `r format(median_steps, nsmall = 0)`.
+- The mean of the total number of steps taken per days is `r mean_steps`.
+- The median of the total number of steps taken per days is `r median_steps`.
 
 ## What is the average daily activity pattern?
 
@@ -131,12 +137,12 @@ median_steps <- median(total_steps_by_day$steps)
 
 ```{r}
 avg_steps_per_interval <- 
-        rawdata %>% 
+        activity %>% 
         na.omit %>%
         group_by(interv_time) %>% 
         summarise(avg_steps = mean(steps))
 
-plot(avg_steps_per_interval$interv_time, avg_steps_per_interval$avg_steps, type = "l",
+plot(avg_steps_per_interval$interv_time, avg_steps_per_interval$avg_steps, type = "l", 
      xlab = "Interval", ylab = "Average Steps per Interval", main = "Average Daily Activity Pattern")
 ```
 
@@ -152,6 +158,42 @@ The 5-minute interval at `r datetime_max_steps` contains the maximum number of s
 
 ## Imputing missing values
 
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+
+```{r}
+## check data for NA values
+na_steps <- sum(is.na(activity$steps))
+na_dates <- sum(is.na(activity$date))
+na_intervals <- sum(is.na(activity$interval))
+```
+
+We have `r ifelse(na_steps == 0, 'no', na_steps)` NA values for steps, `r ifelse(na_dates == 0, 'no', na_dates)` NA values for dates, and `r ifelse(na_intervals == 0, 'no', na_intervals)` NA values for intervals.
+
+2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+
+
+
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+```{r}
+
+```
+
+
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+
+
+
+
