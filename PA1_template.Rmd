@@ -151,7 +151,7 @@ plot(avg_steps_per_interval$interv_time, avg_steps_per_interval$avg_steps, type 
 ```{r echo=FALSE}
 interval_max_steps <- avg_steps_per_interval$interv_time[which.max(avg_steps_per_interval$avg_steps)]
 datetime_max_steps <- as.POSIXct(interval_max_steps, origin = "1970-01-01", tz = Sys.timezone())
-datetime_max_steps <- strftime(datetime_max_steps, format="%H:%M:%S", tz = Sys.timezone())
+datetime_max_steps <- strftime(datetime_max_steps, format="%H:%M", tz = Sys.timezone())
 ```
 
 The 5-minute interval at `r datetime_max_steps` contains the maximum number of steps on average accross all the days in the dataset.
