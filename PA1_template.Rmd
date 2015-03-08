@@ -61,12 +61,6 @@ if (!file.exists(data_file)) {
 ## read the entire dateset
 rawdata <- read.csv(file = data_file, colClasses = c("integer", "Date", "character"))
 
-## print out the column names of the data
-names(rawdata)
-
-## check the structure of the data
-str(rawdata)
-
 ## check data for NA values
 na_steps <- sum(is.na(rawdata$steps))
 na_dates <- sum(is.na(rawdata$date))
