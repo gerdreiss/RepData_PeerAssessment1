@@ -122,7 +122,7 @@ total_steps_by_day <-
 2. Make a histogram of the total number of steps taken each day
 
 ```{r}
-hist(total_steps_by_day$steps, xlab = "Total Steps Per Day", ylab = "Number of Days", 
+hist(total_steps_by_day$steps, xlab = "Total Steps Per Day", ylab = "Number of Days", breaks = 10,
      main = "Frequency of Total Steps per Day")
 ```
 
@@ -194,6 +194,31 @@ activity_imp$avg_steps <- NULL
 
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
+```{r}
+## Calculate the total number of steps taken per day from the data frame with imputed values
+total_steps_by_day <- 
+        activity_imp %>%
+        na.omit %>%
+        group_by(date) %>% 
+        summarise(steps = sum(steps))
+
+hist(total_steps_by_day$steps, xlab = "Total Steps Per Day", ylab = "Number of Days", breaks = 10,
+     main = "Frequency of Total Steps per Day")
+```
+
+Calculate and report the mean and median total number of steps taken per day:
+```{r echo=FALSE}
+
+mean_steps_imp <- format(mean(total_steps_by_day$steps), nsmall = 0)
+median_steps_imp <- format(median(total_steps_by_day$steps), nsmall = 0)
+```
+
+- The mean of the total number of steps taken per days is `r mean_steps_imp`.
+- The median of the total number of steps taken per days is `r median_steps_imp`.
+
+The mean and median values are almost exactly equal as the values calculated before imputing missing values.
+The histogram shows higher step frequency counts. 
+The chosen strategy didn't change the mean and median values as expected since the imputed values were mean values themselves. The histogram shape didn't change, but the step frequency increased as one would expect since more values are available in the data frame.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
