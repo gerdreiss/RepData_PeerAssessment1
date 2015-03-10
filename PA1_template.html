@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Data</title>
+<title>Reproducible Research: Peer Assessment 1</title>
 
 <script type="text/javascript">
 window.onload = function() {
@@ -201,6 +201,10 @@ hr {
 </head>
 
 <body>
+<h1>Reproducible Research: Peer Assessment 1</h1>
+
+<h1></h1>
+
 <p>This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals throughout the day. The data consists of two months of data from an anonymous individual collected during the months of October and November 2012, and includes the number of steps taken in 5 minute intervals each day.</p>
 
 <h2>Data</h2>
@@ -253,20 +257,16 @@ if (!file.exists(data_file)) {
 rawdata &lt;- read.csv(file = data_file, colClasses = c(&quot;integer&quot;, &quot;Date&quot;, &quot;character&quot;))
 
 ## take a look at the first 10 rows
-head(rawdata, n = 10)
+head(rawdata)
 </code></pre>
 
-<pre><code>##    steps       date interval
-## 1     NA 2012-10-01        0
-## 2     NA 2012-10-01        5
-## 3     NA 2012-10-01       10
-## 4     NA 2012-10-01       15
-## 5     NA 2012-10-01       20
-## 6     NA 2012-10-01       25
-## 7     NA 2012-10-01       30
-## 8     NA 2012-10-01       35
-## 9     NA 2012-10-01       40
-## 10    NA 2012-10-01       45
+<pre><code>##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 </code></pre>
 
 <p>When looking at the values of the column &#39;interval&#39; we can observe that they are numerical with a certain pattern:</p>
@@ -335,9 +335,13 @@ activity &lt;- mutate(tbl_df(rawdata), interv_time = interval_to_datetime(interv
 <li>Calculate and report the mean and median of the total number of steps taken per day</li>
 </ol>
 
+<pre><code class="r">mean_steps &lt;- format(mean(total_steps_by_day$steps), nsmall = 0)
+median_steps &lt;- format(median(total_steps_by_day$steps), nsmall = 0)
+</code></pre>
+
 <ul>
-<li>The mean of the total number of steps taken per days is 10766.19.</li>
-<li>The median of the total number of steps taken per days is 10765.</li>
+<li>The mean of the total number of steps taken per days is &#39;mean_steps&#39; = 10766.19.</li>
+<li>The median of the total number of steps taken per days is &#39;median_steps&#39; = 10765.</li>
 </ul>
 
 <h2>What is the average daily activity pattern?</h2>
@@ -362,7 +366,12 @@ plot(avg_steps_per_interval$interv_time, avg_steps_per_interval$avg_steps, type 
 <li>Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</li>
 </ol>
 
-<p>The 5-minute interval at 08:35 contains the maximum number of steps on average accross all the days in the dataset.</p>
+<pre><code class="r">interval_max_steps &lt;- avg_steps_per_interval$interv_time[which.max(avg_steps_per_interval$avg_steps)]
+datetime_max_steps &lt;- as.POSIXct(interval_max_steps, origin = &quot;1970-01-01&quot;, tz = &quot;GMT&quot;)
+datetime_max_steps &lt;- strftime(datetime_max_steps, format=&quot;%H:%M&quot;, tz = &quot;GMT&quot;)
+</code></pre>
+
+<p>The 5-minute interval at &#39;datetime_max_steps&#39; = 08:35 contains the maximum number of steps on average accross all the days in the dataset.</p>
 
 <h2>Imputing missing values</h2>
 

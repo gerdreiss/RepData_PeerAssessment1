@@ -5,6 +5,9 @@ output:
     keep_md: true
 ---
 
+# Reproducible Research: Peer Assessment 1
+========================================================================================================
+
 This assignment makes use of data from a personal activity monitoring device. This device collects data at 5 minute intervals throughout the day. The data consists of two months of data from an anonymous individual collected during the months of October and November 2012, and includes the number of steps taken in 5 minute intervals each day.
 
 ## Data
@@ -58,21 +61,17 @@ if (!file.exists(data_file)) {
 rawdata <- read.csv(file = data_file, colClasses = c("integer", "Date", "character"))
 
 ## take a look at the first 10 rows
-head(rawdata, n = 10)
+head(rawdata)
 ```
 
 ```
-##    steps       date interval
-## 1     NA 2012-10-01        0
-## 2     NA 2012-10-01        5
-## 3     NA 2012-10-01       10
-## 4     NA 2012-10-01       15
-## 5     NA 2012-10-01       20
-## 6     NA 2012-10-01       25
-## 7     NA 2012-10-01       30
-## 8     NA 2012-10-01       35
-## 9     NA 2012-10-01       40
-## 10    NA 2012-10-01       45
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 ```
 
 When looking at the values of the column 'interval' we can observe that they are numerical with a certain pattern:
@@ -139,9 +138,13 @@ hist(total_steps_by_day$steps, xlab = "Total Steps Per Day", ylab = "Number of D
 3. Calculate and report the mean and median of the total number of steps taken per day
 
 
+```r
+mean_steps <- format(mean(total_steps_by_day$steps), nsmall = 0)
+median_steps <- format(median(total_steps_by_day$steps), nsmall = 0)
+```
 
-- The mean of the total number of steps taken per days is 10766.19.
-- The median of the total number of steps taken per days is 10765.
+- The mean of the total number of steps taken per days is 'mean_steps' = 10766.19.
+- The median of the total number of steps taken per days is 'median_steps' = 10765.
 
 ## What is the average daily activity pattern?
 
@@ -164,8 +167,13 @@ plot(avg_steps_per_interval$interv_time, avg_steps_per_interval$avg_steps, type 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
+```r
+interval_max_steps <- avg_steps_per_interval$interv_time[which.max(avg_steps_per_interval$avg_steps)]
+datetime_max_steps <- as.POSIXct(interval_max_steps, origin = "1970-01-01", tz = "GMT")
+datetime_max_steps <- strftime(datetime_max_steps, format="%H:%M", tz = "GMT")
+```
 
-The 5-minute interval at 08:35 contains the maximum number of steps on average accross all the days in the dataset.
+The 5-minute interval at 'datetime_max_steps' = 08:35 contains the maximum number of steps on average accross all the days in the dataset.
 
 ## Imputing missing values
 
@@ -225,7 +233,6 @@ Calculate and report the mean and median total number of steps taken per day:
 The mean and median values are almost exactly equal as the values calculated before imputing missing values.
 The histogram shows higher step frequency counts. 
 The chosen strategy didn't change the mean and median values as expected since the imputed values were mean values themselves. The histogram shape didn't change, but the step frequency increased as one would expect since more values are available in the data frame.
-
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
